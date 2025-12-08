@@ -5,9 +5,11 @@ import {
   Eraser,
   Palette,
   Pencil,
+  Redo,
   Square,
   Star,
   Triangle,
+  Undo,
 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -18,6 +20,10 @@ const Toolbar = ({
   onColorChange,
   brushSize,
   onBrushSizeChange,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo
 }) => {
   const [showShapes, setShowShapes] = useState(false);
 
@@ -121,6 +127,39 @@ const Toolbar = ({
       </div>
 
       <div style={dividerStyle}></div>
+
+      <button
+        onClick={onUndo}
+        disabled={!canUndo}
+        style={{
+          ...toolButtonStyle,
+          backgroundColor: canUndo ? "white" : "#f3f4f6",
+          opacity: canUndo ? 1 : 0.5,
+          cursor: canUndo ? "pointer" : "not-allowed",
+          padding: "8px",
+        }}
+        title="Undo"
+      >
+        <Undo size={22} strokeWidth={1.5} color={canRedo ? "#333" : "#9ca3af"}  />
+      </button>
+
+      <button
+        onClick={onRedo}
+        disabled={!canRedo}
+        style={{
+          ...toolButtonStyle,
+          backgroundColor: canRedo ? "white" : "#f3f4f6",
+          opacity: canRedo ? 1 : 0.5,
+          cursor: canRedo ? "pointer" : "not-allowed",
+          padding: "8px",
+        }}
+        title="Redo"
+      >
+        <Redo size={22} strokeWidth={1.5} color={canRedo ? "#333" : "#9ca3af"} />
+      </button>
+
+      <div style={dividerStyle}></div>
+
       <label style={labelStyle}>Pencil & Eraser Size: {brushSize}px</label>
       <input
         type="range"
