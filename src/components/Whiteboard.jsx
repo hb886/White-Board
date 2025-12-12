@@ -147,10 +147,11 @@ const Whiteboard = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth - 80;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight - 60;
 
     const ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     ctx.strokeStyle = selectedColor;
     ctx.lineWidth = brushSize;
     ctxRef.current = ctx;
@@ -176,32 +177,71 @@ const Whiteboard = () => {
     }
   };
 
-  const saveToHistory = () => {
+//   const saveToHistory = () => {
+//   const canvas = canvasRef.current;
+//   if (!canvas) return;
+
+//   const imageData = canvas.toDataURL();
+//   setHistory((prev) => {
+//     const newHistory = prev.slice(0, historyStep + 1);
+//     return [...newHistory, imageData];
+//   });
+//   setHistoryStep((prev) => prev + 1);
+// };
+
+
+const saveToHistory = () => {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
   const imageData = canvas.toDataURL();
-  setHistory((prev) => {
-    const newHistory = prev.slice(0, historyStep + 1);
-    return [...newHistory, imageData];
+  setHistoryStep((prevStep) => {
+    const newStep = prevStep + 1;
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, newStep);
+      return [...newHistory, imageData];
+    });
+    return newStep;
   });
-  setHistoryStep((prev) => prev + 1);
 };
+
+// const undo = () => {
+//   if (historyStep > 0) {
+//     const newStep = historyStep - 1;
+//     setHistoryStep(newStep);
+//     restoreFromHistory(history[newStep]);
+//   }
+// };
 
 const undo = () => {
-  if (historyStep > 0) {
-    const newStep = historyStep - 1;
-    setHistoryStep(newStep);
-    restoreFromHistory(history[newStep]);
-  }
+  setHistoryStep((prevStep) => {
+    if (prevStep > 0) {
+      const newStep = prevStep - 1;
+      restoreFromHistory(history[newStep]);
+      return newStep;
+    }
+    return prevStep;
+  });
 };
 
+// const redo = () => {
+//   if (historyStep < history.length - 1) {
+//     const newStep = historyStep + 1;
+//     setHistoryStep(newStep);
+//     restoreFromHistory(history[newStep]);
+//   }
+// };
+
+
 const redo = () => {
-  if (historyStep < history.length - 1) {
-    const newStep = historyStep + 1;
-    setHistoryStep(newStep);
-    restoreFromHistory(history[newStep]);
-  }
+  setHistoryStep((prevStep) => {
+    if (prevStep < history.length - 1) {
+      const newStep = prevStep + 1;
+      restoreFromHistory(history[newStep]);
+      return newStep;
+    }
+    return prevStep;
+  });
 };
 
 const restoreFromHistory = (imageData) => {
@@ -422,14 +462,27 @@ const restoreFromHistory = (imageData) => {
     ctx.closePath();
   };
 
+  // const getMousePos = (e) => {
+  //   const canvas = canvasRef.current;
+  //   const rect = canvas.getBoundingClientRect();
+  //   return {
+  //     x: e.clientX - rect.left,
+  //     y: e.clientY - rect.top,
+  //   };
+  // };
+
   const getMousePos = (e) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
+  const canvas = canvasRef.current;
+  const rect = canvas.getBoundingClientRect();
+  
+  // Account for toolbar width (80px) that's taking up space
+  const toolbarWidth = 80;
+  
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top,
   };
+};
 
   return (
     <div style={containerStyle}>
