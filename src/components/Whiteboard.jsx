@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Toolbar from "./Toolbar";
 
-const SOCKET_SERVER = "http://localhost:3001"; 
+const SOCKET_SERVER = "https://white-board-server-mbx7.onrender.com"; 
 let socket;
 
 const Whiteboard = () => {
@@ -258,7 +258,7 @@ const restoreFromHistory = (imageData) => {
   img.src = imageData;
 };
 
-  const startDrawing = (e) => {
+const startDrawing = (e) => {
     const pos = getMousePos(e);
     isDrawingRef.current = true;
 
@@ -286,6 +286,9 @@ const restoreFromHistory = (imageData) => {
       return;
     }
 
+    // Reset to normal drawing mode for shapes
+    ctxRef.current.globalCompositeOperation = "source-over";
+    
     setStartPos(pos);
     const canvas = canvasRef.current;
     const ctx = ctxRef.current;
